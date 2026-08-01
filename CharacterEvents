@@ -1,0 +1,44 @@
+📄 Characters/CharacterEvents.py
+
+"""
+CharacterEvents.py
+------------------
+Призначення:
+    Керує подіями персонажів у MotherCube.
+    Використовується CharacterManager та CharacterAI.
+    Відповідає за зміни стану, взаємодії та спеціальні сценарії.
+
+Принцип:
+    - Зберігає список подій персонажів.
+    - Дозволяє запускати та відміняти події.
+    - Інтегрується з CharacterState для впливу на персонажів.
+"""
+
+class CharacterEvents:
+    def __init__(self):
+        self.events = []
+
+    def trigger_event(self, char_id: str, event_type: str, value):
+        """Запускає подію для персонажа."""
+        event = {"char_id": char_id, "type": event_type, "value": value}
+        self.events.append(event)
+        return event
+
+    def cancel_event(self, char_id: str, event_type: str):
+        """Відміняє подію для персонажа."""
+        self.events = [
+            e for e in self.events
+            if not (e["char_id"] == char_id and e["type"] == event_type)
+        ]
+
+    def list_events(self, char_id: str = None):
+        """Повертає список активних подій (для конкретного персонажа або всіх)."""
+        if char_id:
+            return [e for e in self.events if e["char_id"] == char_id]
+        return self.events
+
+    def apply_events(self, character_ai):
+        """Застосовує події до персонажа через його AI."""
+        for event in self.events:
+            if event["char_id"] == character_ai.char_id:
+                character_ai.react_to_event(event)
