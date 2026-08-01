@@ -1,0 +1,47 @@
+📄 Characters/CharacterState.py
+
+"""
+CharacterState.py
+-----------------
+Призначення:
+    Зберігає та керує станом персонажів у MotherCube.
+    Використовується CharacterManager та AIEngine.
+    Відповідає за здоров'я, енергію, емоції та інші параметри.
+
+Принцип:
+    - Кожен персонаж має власний стан.
+    - Стан може змінюватися під час симуляції.
+    - Використовується для взаємодії з AIEngine та WorldState.
+"""
+
+class CharacterState:
+    def __init__(self, health: int = 100, energy: int = 100, mood: str = "neutral"):
+        self.health = health
+        self.energy = energy
+        self.mood = mood
+        self.attributes = {}
+
+    def update_health(self, value: int):
+        """Оновлює рівень здоров'я."""
+        self.health = max(0, min(100, value))
+
+    def update_energy(self, value: int):
+        """Оновлює рівень енергії."""
+        self.energy = max(0, min(100, value))
+
+    def update_mood(self, mood: str):
+        """Оновлює настрій персонажа."""
+        self.mood = mood
+
+    def set_attribute(self, key: str, value):
+        """Встановлює додатковий атрибут."""
+        self.attributes[key] = value
+
+    def get_state(self):
+        """Повертає поточний стан персонажа."""
+        return {
+            "health": self.health,
+            "energy": self.energy,
+            "mood": self.mood,
+            "attributes": self.attributes
+        }
