@@ -1,0 +1,46 @@
+📄 Characters/CharacterManager.py
+
+"""
+CharacterManager.py
+-------------------
+Призначення:
+    Керує персонажами у світі MotherCube.
+    Використовується SceneEngine та AIEngine.
+    Відповідає за створення, видалення та оновлення персонажів.
+
+Принцип:
+    - Зберігає всі персонажі світу.
+    - Дозволяє додавати, видаляти та змінювати властивості.
+    - Інтегрується з WorldState та Simulation.
+"""
+
+from Core.Utils import generate_id
+
+
+class CharacterManager:
+    def __init__(self):
+        self.characters = {}
+
+    def create_character(self, properties: dict) -> str:
+        """Створює нового персонажа."""
+        char_id = generate_id("CHAR")
+        self.characters[char_id] = properties
+        return char_id
+
+    def delete_character(self, char_id: str):
+        """Видаляє персонажа зі світу."""
+        if char_id in self.characters:
+            del self.characters[char_id]
+
+    def update_character(self, char_id: str, properties: dict):
+        """Оновлює властивості персонажа."""
+        if char_id in self.characters:
+            self.characters[char_id].update(properties)
+
+    def get_character(self, char_id: str):
+        """Повертає дані про персонажа."""
+        return self.characters.get(char_id, None)
+
+    def list_characters(self):
+        """Повертає список усіх персонажів."""
+        return self.characters
