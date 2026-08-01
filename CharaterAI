@@ -1,0 +1,50 @@
+📄 Characters/CharacterAI.py
+
+"""
+CharacterAI.py
+--------------
+Призначення:
+    Модуль базової поведінки персонажів MotherCube.
+    Використовується CharacterManager та AIEngine.
+    Відповідає за прийняття рішень та реакції на події.
+
+Принцип:
+    - Кожен персонаж має власний AI.
+    - AI реагує на події світу та змінює стан персонажа.
+    - Інтегрується з CharacterState та WorldState.
+"""
+
+from Characters.CharacterState import CharacterState
+
+
+class CharacterAI:
+    def __init__(self, char_id: str, state: CharacterState):
+        self.char_id = char_id
+        self.state = state
+
+    def react_to_event(self, event: dict):
+        """Реакція персонажа на подію."""
+        if event.get("type") == "damage":
+            new_health = self.state.health - event.get("value", 0)
+            self.state.update_health(new_health)
+        elif event.get("type") == "rest":
+            new_energy = self.state.energy + event.get("value", 0)
+            self.state.update_energy(new_energy)
+        elif event.get("type") == "emotion":
+            self.state.update_mood(event.get("value", "neutral"))
+
+    def decide_action(self, context: dict):
+        """Приймає рішення на основі контексту."""
+        if self.state.energy < 20:
+            return {"action": "rest", "reason": "low energy"}
+        elif self.state.health < 30:
+            return {"action": "heal", "reason": "low health"}
+        else:
+            return {"action": "explore", "reason": "normal state"}
+
+    def get_ai_state(self):
+        """Повертає стан AI персонажа."""
+        return {
+            "char_id": self.char_id,
+            "state": self.state.get_state()
+        }
