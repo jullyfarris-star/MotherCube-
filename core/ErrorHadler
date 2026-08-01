@@ -1,0 +1,36 @@
+📄 Core/ErrorHandler.py
+
+"""
+ErrorHandler.py
+---------------
+Призначення:
+    Централізована обробка помилок MotherCube.
+    Використовується CoreEngine, EventBus, Registry та іншими модулями.
+    Забезпечує єдиний механізм повідомлення про винятки та критичні збої.
+
+Принцип:
+    - ErrorHandler приймає винятки від модулів.
+    - Логує їх через Logger.
+    - Генерує подію "ErrorEvent" через EventBus.
+"""
+
+from Core.Logger import Logger
+from Core.SystemEvents import SYSTEM_STOP
+from typing import Any
+
+
+class ErrorHandler:
+    def __init__(self, event_bus, logger: Logger):
+        self.event_bus = event_bus
+        self.logger = logger
+
+    def handle_error(self, error: Exception, module: str = "System"):
+        """Обробляє виняток: логування + подія."""
+        message = f"❌ Помилка у модулі {module}: {str(error)}"
+        self.logger.error(message, module=module)
+        self.event_bus.publish("ErrorEvent", {"module": module, "error": str(error)})
+
+    def critical_stop(self, reason: str):
+        """Зупиняє систему при критичній помилці."""
+        self.logger.error(f"🛑 Критичний збій: {reason}", module="CoreEngine")
+        self.event_bus.publish(SYSTEM_STOP, {"status": "error", "reason": reason})
