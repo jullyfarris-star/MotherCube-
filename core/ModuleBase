@@ -1,0 +1,54 @@
+📄 Core/ModuleBase.py
+
+"""
+ModuleBase.py
+-------------
+Призначення:
+    Базовий клас для всіх модулів MotherCube.
+    Використовується Simulation, World, Characters, AI, Interface та інші.
+    Забезпечує єдину структуру для інтеграції з EventBus та Registry.
+
+Принцип:
+    - Кожен модуль наслідує ModuleBase.
+    - Має ім'я, список подій для прослуховування та генерації.
+    - Реєструється у Registry.
+    - Використовує EventBus для комунікації.
+"""
+
+from typing import List, Dict, Callable
+from Core.EventBus import EventBus
+from Core.Registry import Registry
+
+
+class ModuleBase:
+    def __init__(self, name: str, event_bus: EventBus, registry: Registry):
+        self.name = name
+        self.event_bus = event_bus
+        self.registry = registry
+        self.events_in: List[str] = []
+        self.events_out: List[str] = []
+        self.handlers: Dict[str, Callable] = {}
+
+    def register(self):
+        """Реєструє модуль у Registry."""
+        self.registry.register_module(self.name, self.events_in, self.events_out)
+        if self.handlers:
+            self.registry.subscribe_module(self.name, self.handlers)
+
+    def emit(self, event_name: str, data=None):
+        """Генерує подію через EventBus."""
+        if event_name in self.events_out:
+            self.event_bus.publish(event_name, {"module": self.name, "data": data})
+
+    def add_handler(self, event_name: str, handler: Callable):
+        """Додає обробник для події."""
+        self.events_in.append(event_name)
+        self.handlers[event_name] = handler
+
+    def info(self):
+        """Повертає інформацію про модуль."""
+        return {
+            "name": self.name,
+            "events_in": self.events_in,
+            "events_out": self.events_out
+        }
