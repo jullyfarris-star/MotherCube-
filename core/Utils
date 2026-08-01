@@ -1,0 +1,42 @@
+
+📄 Core/Utils.py
+
+"""
+Utils.py
+--------
+Призначення:
+    Набір допоміжних утиліт для MotherCube.
+    Використовується CoreEngine, Diagnostics, Registry та іншими модулями.
+    Забезпечує повторно використовувані функції для зручності.
+
+Принцип:
+    - Утиліти не залежать від конкретних модулів.
+    - Використовуються як інструменти для спрощення коду.
+"""
+
+import uuid
+import time
+import json
+
+
+def generate_id(prefix: str = "MC") -> str:
+    """Генерує унікальний ID для об'єкта чи події."""
+    return f"{prefix}-{uuid.uuid4().hex[:8]}"
+
+
+def timestamp() -> str:
+    """Повертає поточний час у форматі ISO."""
+    return time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime())
+
+
+def safe_json(data) -> str:
+    """Перетворює дані у JSON-рядок з обробкою помилок."""
+    try:
+        return json.dumps(data, ensure_ascii=False, indent=2)
+    except Exception as e:
+        return f"JSON Error: {str(e)}"
+
+
+def clamp(value: float, min_value: float, max_value: float) -> float:
+    """Обмежує значення у діапазоні [min_value, max_value]."""
+    return max(min_value, min(value, max_value))
