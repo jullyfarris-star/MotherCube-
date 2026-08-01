@@ -1,0 +1,60 @@
+📄 Core/CopilotAssistant.ру
+
+"""
+CopilotAssistant.py
+-------------------
+Призначення:
+    Внутрішній помічник MotherCube.
+    Використовується CoreEngine для підтримки діагностики, моніторингу та логування.
+    Забезпечує інтеграцію між Diagnostics, ResourceMonitor та Logger.
+
+Принцип:
+    - CopilotAssistant допомагає ядру аналізувати стан системи.
+    - Виконує health-check, моніторинг ресурсів та логування.
+    - Може генерувати події для інтерфейсу (наприклад, повідомлення користувачу).
+"""
+
+import time
+from Core.Logger import Logger
+from Core.Diagnostics import Diagnostics
+from Core.ResourceMonitor import ResourceMonitor
+from Core.StateManager import StateManager
+
+
+class CopilotAssistant:
+    def __init__(self, event_bus, registry, event_queue):
+        self.logger = Logger(level="INFO")
+        self.diagnostics = Diagnostics(event_bus, registry, event_queue, self.logger)
+        self.resource_monitor = ResourceMonitor(self.logger)
+        self.state_manager = StateManager()
+        self.event_bus = event_bus
+
+    def run_diagnostics(self):
+        """Запускає діагностику системи."""
+        self.logger.info("🔍 Запуск діагностики...", module="CopilotAssistant")
+        modules = self.diagnostics.health_check()
+        cycles = self.diagnostics.detect_cycles()
+        return {"modules": modules, "cycles": cycles}
+
+    def monitor_resources(self):
+        """Відстежує ресурси системи."""
+        self.logger.info("📊 Перевірка ресурсів...", module="CopilotAssistant")
+        stats = self.resource_monitor.check_resources()
+        process = self.resource_monitor.check_process()
+        return {"system": stats, "process": process}
+
+    def save_snapshot(self):
+        """Зберігає стан системи."""
+        snapshot = self.state_manager.snapshot()
+        self.logger.info("💾 Стан системи збережено.", module="CopilotAssistant")
+        self.event_bus.publish("SaveConfirmation", {"timestamp": time.time()})
+        return snapshot
+
+    def restore_snapshot(self, index: int = -1):
+        """Відновлює стан системи."""
+        state = self.state_manager.restore(index)
+        if state:
+            self.logger.info("♻️ Стан системи відновлено.", module="CopilotAssistant")
+        else:
+            self.logger.warning("⚠️ Немає збережених станів для відновлення.", module="CopilotAssistant")
+        return state
