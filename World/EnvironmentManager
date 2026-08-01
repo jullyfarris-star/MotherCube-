@@ -1,0 +1,39 @@
+📄 World/EnvironmentManager.py
+
+"""
+EnvironmentManager.py
+---------------------
+Призначення:
+    Керує середовищем світу MotherCube.
+    Використовується ContextEngine та SceneEngine.
+    Відповідає за клімат, освітлення та атмосферні умови.
+
+Принцип:
+    - Зберігає глобальні параметри середовища.
+    - Дозволяє змінювати кліматичні умови.
+    - Інтегрується з Simulation для впливу на фізику та хімію.
+"""
+
+class EnvironmentManager:
+    def __init__(self):
+        self.environment = {
+            "temperature": 20.0,
+            "weather": "clear",
+            "light": "day"
+        }
+
+    def set_temperature(self, value: float):
+        """Встановлює температуру."""
+        self.environment["temperature"] = value
+
+    def set_weather(self, condition: str):
+        """Встановлює погодні умови."""
+        self.environment["weather"] = condition
+
+    def set_light(self, mode: str):
+        """Встановлює освітлення (day/night)."""
+        self.environment["light"] = mode
+
+    def get_environment(self):
+        """Повертає поточні параметри середовища."""
+        return self.environment
