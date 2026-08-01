@@ -1,0 +1,61 @@
+📄 Core/ResourceMonitor
+
+"""
+ResourceMonitor.py
+------------------
+Призначення:
+    Відстежує використання ресурсів MotherCube.
+    Використовується CoreEngine та Diagnostics.
+    Дозволяє контролювати пам'ять, CPU та кількість активних подій.
+
+Принцип:
+    - Перевіряє системні ресурси.
+    - Генерує попередження при перевищенні порогів.
+    - Інтегрується з Logger для повідомлень.
+"""
+
+import os
+import psutil
+from Core.Logger import Logger
+
+
+class ResourceMonitor:
+    def __init__(self, logger: Logger):
+        self.logger = logger
+
+    def check_resources(self):
+        """Перевіряє використання CPU та пам'яті."""
+        cpu_usage = psutil.cpu_percent(interval=0.1)
+        memory_info = psutil.virtual_memory()
+        mem_usage = memory_info.percent
+
+        self.logger.debug(
+            f"CPU: {cpu_usage:.2f}% | Memory: {mem_usage:.2f}%",
+            module="ResourceMonitor"
+        )
+
+        return {"cpu": cpu_usage, "memory": mem_usage}
+
+    def check_process(self):
+        """Перевіряє ресурси поточного процесу MotherCube."""
+        process = psutil.Process(os.getpid())
+        mem_info = process.memory_info()
+        cpu_time = process.cpu_times()
+
+        stats = {
+            "rss": mem_info.rss,   # Resident Set Size
+            "vms": mem_info.vms,   # Virtual Memory Size
+            "cpu_user": cpu_time.user,
+            "cpu_system": cpu_time.system
+        }
+
+        self.logger.debug(f"Process stats: {stats}", module="ResourceMonitor")
+        return stats
+
+    def alert_if_overloaded(self, cpu_threshold=85.0, mem_threshold=90.0):
+        """Генерує попередження, якщо ресурси перевищують поріг."""
+        resources = self.check_resources()
+        if resources["cpu"] > cpu_threshold:
+            self.logger.warning("⚠️ CPU перевищує поріг!", module="ResourceMonitor")
+        if resources["memory"] > mem_threshold:
+            self.logger.warning("⚠️ Пам'ять перевищує поріг!", module="ResourceMonitor")
