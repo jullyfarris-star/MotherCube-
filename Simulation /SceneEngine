@@ -1,0 +1,50 @@
+📄 Simulation/SceneEngine.py
+
+"""
+SceneEngine.py
+--------------
+Призначення:
+    Модуль сцени MotherCube.
+    Відповідає за просторове розташування об'єктів та оновлення середовища.
+    Використовується CoreEngine через TickEvent.
+
+Принцип:
+    - Отримує TickEvent від CoreEngine.
+    - Оновлює сцену (позиції, взаємодії, зміни середовища).
+    - Генерує подію SceneEvent.
+"""
+
+from Core.ModuleBase import ModuleBase
+from Core.SystemEvents import TICK_EVENT, SCENE_EVENT
+
+
+class SceneEngine(ModuleBase):
+    def __init__(self, event_bus, registry):
+        super().__init__("SceneEngine", event_bus, registry)
+        self.events_in = [TICK_EVENT]
+        self.events_out = [SCENE_EVENT]
+
+        # Підписка на TickEvent
+        self.add_handler(TICK_EVENT, self.on_tick)
+
+        # Стан сцени
+        self.scene_objects = {}
+
+    def add_object(self, object_id: str, properties: dict):
+        """Додає об'єкт у сцену."""
+        self.scene_objects[object_id] = properties
+
+    def remove_object(self, object_id: str):
+        """Видаляє об'єкт зі сцени."""
+        if object_id in self.scene_objects:
+            del self.scene_objects[object_id]
+
+    def on_tick(self, data):
+        """Оновлення сцени на кожному тіку."""
+        tick = data.get("tick", 0)
+        # Тут буде логіка оновлення середовища (рух, взаємодії, зміни)
+        self.emit(SCENE_EVENT, {
+            "tick": tick,
+            "objects": len(self.scene_objects),
+            "status": "scene updated"
+        })
