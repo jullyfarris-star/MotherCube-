@@ -1,0 +1,54 @@
+
+📄 Core/Bootstrap.py
+
+"""
+Bootstrap.py
+------------
+Призначення:
+    Початковий запуск MotherCube.
+    Ініціалізує CoreEngine, EventBus, Registry, Logger та інші базові сервіси.
+    Використовується як точка входу для системи.
+
+Принцип:
+    - Створює ядро (CoreEngine).
+    - Підключає базові модулі (Logger, ErrorHandler, StateManager, TaskScheduler).
+    - Запускає систему через CoreEngine.start().
+"""
+
+from Core.CoreEngine import CoreEngine
+from Core.Logger import Logger
+from Core.ErrorHandler import ErrorHandler
+from Core.StateManager import StateManager
+from Core.TaskScheduler import TaskScheduler
+from Core.Diagnostics import Diagnostics
+from Core.ResourceMonitor import ResourceMonitor
+
+
+class Bootstrap:
+    def __init__(self):
+        # Ініціалізація ядра
+        self.core = CoreEngine()
+
+        # Базові сервіси
+        self.logger = Logger(level="INFO")
+        self.error_handler = ErrorHandler(self.core.event_bus, self.logger)
+        self.state_manager = StateManager()
+        self.task_scheduler = TaskScheduler(self.core.event_bus)
+        self.diagnostics = Diagnostics(
+            self.core.event_bus, self.core.registry, None, self.logger
+        )
+        self.resource_monitor = ResourceMonitor(self.logger)
+
+    def start_system(self):
+        """Запускає MotherCube."""
+        self.logger.info("🔧 Ініціалізація системи MotherCube...", module="Bootstrap")
+        try:
+            self.core.start()
+            self.logger.info("✅ MotherCube успішно запущено!", module="Bootstrap")
+        except Exception as e:
+            self.error_handler.critical_stop(str(e))
+
+    def stop_system(self):
+        """Зупиняє MotherCube."""
+        self.logger.info("🛑 Зупинка системи MotherCube...", module="Bootstrap")
+        self.core.stop()
