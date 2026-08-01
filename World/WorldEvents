@@ -1,0 +1,42 @@
+📄 World/WorldEvents.py
+
+"""
+WorldEvents.py
+--------------
+Призначення:
+    Керує глобальними подіями світу MotherCube.
+    Використовується ContextEngine та WorldState.
+    Відповідає за унікальні сценарії (катастрофи, глобальні зміни).
+
+Принцип:
+    - Зберігає список світових подій.
+    - Дозволяє запускати та відміняти події.
+    - Інтегрується з WorldState для впливу на об'єкти та середовище.
+"""
+
+class WorldEvents:
+    def __init__(self):
+        self.events = []
+
+    def trigger_event(self, event_name: str, impact: dict):
+        """Запускає глобальну подію."""
+        event = {"name": event_name, "impact": impact}
+        self.events.append(event)
+        return event
+
+    def cancel_event(self, event_name: str):
+        """Відміняє глобальну подію."""
+        self.events = [e for e in self.events if e["name"] != event_name]
+
+    def list_events(self):
+        """Повертає список активних подій."""
+        return self.events
+
+    def apply_events(self, world_state):
+        """Застосовує вплив подій до світу."""
+        for event in self.events:
+            if "environment" in event["impact"]:
+                world_state.environment.environment.update(event["impact"]["environment"])
+            if "objects" in event["impact"]:
+                for obj_id, props in event["impact"]["objects"].items():
+                    world_state.objects.update_object(obj_id, props)
