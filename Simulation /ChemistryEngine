@@ -1,0 +1,40 @@
+📄 Simulation/ChemistryEngine.py
+
+"""
+ChemistryEngine.py
+------------------
+Призначення:
+    Модуль хімії MotherCube.
+    Відповідає за симуляцію хімічних реакцій та змін станів.
+    Використовується CoreEngine через TickEvent.
+
+Принцип:
+    - Отримує TickEvent від CoreEngine.
+    - Оновлює хімічні параметри об'єктів.
+    - Генерує подію ChemistryUpdate.
+"""
+
+from Core.ModuleBase import ModuleBase
+from Core.SystemEvents import TICK_EVENT, CHEMISTRY_UPDATE
+from Core.Config import CHEMISTRY_DECAY
+
+
+class ChemistryEngine(ModuleBase):
+    def __init__(self, event_bus, registry):
+        super().__init__("ChemistryEngine", event_bus, registry)
+        self.events_in = [TICK_EVENT]
+        self.events_out = [CHEMISTRY_UPDATE]
+
+        # Підписка на TickEvent
+        self.add_handler(TICK_EVENT, self.on_tick)
+
+    def on_tick(self, data):
+        """Обробка кожного тіку: оновлення хімії."""
+        tick = data.get("tick", 0)
+        # Тут буде логіка хімічних процесів (розпад, реакції, зміни станів)
+        reaction_strength = 1.0 * CHEMISTRY_DECAY
+        self.emit(CHEMISTRY_UPDATE, {
+            "tick": tick,
+            "reaction_strength": reaction_strength,
+            "status": "chemistry updated"
+        })
