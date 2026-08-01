@@ -1,0 +1,57 @@
+📄 Core/StateManager.py
+
+"""
+StateManager.py
+---------------
+Призначення:
+    Управління станом MotherCube.
+    Використовується CoreEngine та Interface для збереження і відновлення.
+    Забезпечує централізоване сховище даних симуляції.
+
+Принцип:
+    - StateManager зберігає глобальний стан системи.
+    - Дозволяє робити snapshot (знімок) і restore (відновлення).
+    - Використовується для SaveState та SaveConfirmation подій.
+"""
+
+import copy
+import time
+
+
+class StateManager:
+    def __init__(self):
+        # Поточний стан системи
+        self._state = {}
+        # Історія збережень
+        self._history = []
+
+    def update_state(self, key: str, value):
+        """Оновлює частину стану."""
+        self._state[key] = value
+
+    def get_state(self, key: str = None):
+        """Повертає стан або його частину."""
+        if key:
+            return self._state.get(key, None)
+        return self._state
+
+    def snapshot(self):
+        """Робить знімок поточного стану."""
+        snapshot = {
+            "timestamp": time.time(),
+            "state": copy.deepcopy(self._state)
+        }
+        self._history.append(snapshot)
+        return snapshot
+
+    def restore(self, index: int = -1):
+        """Відновлює стан із історії (за замовчуванням останній)."""
+        if not self._history:
+            return None
+        snapshot = self._history[index]
+        self._state = copy.deepcopy(snapshot["state"])
+        return self._state
+
+    def history(self):
+        """Повертає список усіх збережених станів."""
+        return self._history
