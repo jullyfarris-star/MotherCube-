@@ -1,0 +1,50 @@
+📄 Simulation/ContextEngine.py
+
+
+"""
+ContextEngine.py
+----------------
+Призначення:
+    Модуль контексту MotherCube.
+    Відповідає за глобальні умови симуляції (середовище, правила, параметри).
+    Використовується CoreEngine через TickEvent.
+
+Принцип:
+    - Отримує TickEvent від CoreEngine.
+    - Оновлює глобальний контекст (температура, освітлення, правила).
+    - Генерує подію ContextUpdate.
+"""
+
+from Core.ModuleBase import ModuleBase
+from Core.SystemEvents import TICK_EVENT, CONTEXT_UPDATE
+
+
+class ContextEngine(ModuleBase):
+    def __init__(self, event_bus, registry):
+        super().__init__("ContextEngine", event_bus, registry)
+        self.events_in = [TICK_EVENT]
+        self.events_out = [CONTEXT_ mUPDATE]
+
+        # Підписка на TickEvent
+        self.add_handler(TICK_EVENT, self.on_tick)
+
+        # Глобальні параметри середовища
+        self.environment = {
+            "temperature": 20.0,
+            "light": "day",
+            "rules": {}
+        }
+
+    def set_rule(self, rule_name: str, value):
+        """Встановлює глобальне правило."""
+        self.environment["rules"][rule_name] = value
+
+    def on_tick(self, data):
+        """Оновлення контексту на кожному тіку."""
+        tick = data.get("tick", 0)
+        # Тут може бути логіка зміни середовища (день/ніч, температура, правила)
+        self.emit(CONTEXT_UPDATE, {
+            "tick": tick,
+            "environment": self.environment,
+            "status": "context updated"
+        })
