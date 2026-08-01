@@ -1,0 +1,34 @@
+📄 Simulation/PhysicsEngine.py
+
+"""
+PhysicsEngine.py
+----------------
+Призначення:
+    Модуль фізики MotherCube.
+    Відповідає за симуляцію руху, зіткнень та взаємодії об'єктів.
+    Використовується CoreEngine через TickEvent.
+
+Принцип:
+    - Отримує TickEvent від CoreEngine.
+    - Оновлює позиції об'єктів.
+    - Генерує подію PhysicsUpdate.
+"""
+
+from Core.ModuleBase import ModuleBase
+from Core.SystemEvents import TICK_EVENT, PHYSICS_UPDATE
+
+
+class PhysicsEngine(ModuleBase):
+    def __init__(self, event_bus, registry):
+        super().__init__("PhysicsEngine", event_bus, registry)
+        self.events_in = [TICK_EVENT]
+        self.events_out = [PHYSICS_UPDATE]
+
+        # Підписка на TickEvent
+        self.add_handler(TICK_EVENT, self.on_tick)
+
+    def on_tick(self, data):
+        """Обробка кожного тіку: оновлення фізики."""
+        tick = data.get("tick", 0)
+        # Тут буде логіка оновлення фізики (рух, сили, зіткнення)
+        self.emit(PHYSICS_UPDATE, {"tick": tick, "status": "physics updated"})
