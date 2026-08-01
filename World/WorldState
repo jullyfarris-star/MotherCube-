@@ -1,0 +1,45 @@
+📄 World/WorldState.py
+
+"""
+WorldState.py
+-------------
+Призначення:
+    Зберігає глобальний стан світу MotherCube.
+    Використовується Simulation та ContextEngine.
+    Відповідає за інтеграцію об'єктів та середовища.
+
+Принцип:
+    - Об'єднує ObjectManager та EnvironmentManager.
+    - Надає єдиний доступ до стану світу.
+    - Використовується для оновлення та збереження симуляції.
+"""
+
+from World.ObjectManager import ObjectManager
+from World.EnvironmentManager import EnvironmentManager
+
+
+class WorldState:
+    def __init__(self):
+        self.objects = ObjectManager()
+        self.environment = EnvironmentManager()
+
+    def snapshot(self):
+        """Робить знімок стану світу."""
+        return {
+            "objects": self.objects.list_objects(),
+            "environment": self.environment.get_environment()
+        }
+
+    def restore(self, snapshot: dict):
+        """Відновлює стан світу зі знімка."""
+        if "objects" in snapshot:
+            self.objects.objects = snapshot["objects"]
+        if "environment" in snapshot:
+            self.environment.environment = snapshot["environment"]
+
+    def info(self):
+        """Повертає інформацію про світ."""
+        return {
+            "objects_count": len(self.objects.list_objects()),
+            "environment": self.environment.get_environment()
+        }
