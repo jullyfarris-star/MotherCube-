@@ -1,0 +1,54 @@
+📄 Core/TaskScheduler.py
+
+"""
+TaskScheduler.py
+----------------
+Призначення:
+    Планувальник завдань MotherCube.
+    Використовується CoreEngine для запуску подій за розкладом.
+    Дозволяє виконувати періодичні або відкладені завдання.
+
+Принцип:
+    - Завдання додаються у планувальник з інтервалом або часом.
+    - CoreEngine викликає TaskScheduler на кожному тіку.
+    - Якщо настав час — завдання виконується і генерує подію через EventBus.
+"""
+
+import time
+from typing import Callable, Dict, Any
+
+
+class TaskScheduler:
+    def __init__(self, event_bus):
+        self.event_bus = event_bus
+        # Список завдань: {task_name: {"interval": float, "last_run": float, "callback": Callable}}
+        self._tasks: Dict[str, Dict[str, Any]] = {}
+
+    def add_task(self, task_name: str, interval: float, callback: Callable):
+        """Додає періодичне завдання."""
+        self._tasks[task_name] = {
+            "interval": interval,
+            "last_run": time.time(),
+            "callback": callback
+        }
+
+    def remove_task(self, task_name: str):
+        """Видаляє завдання з планувальника."""
+        if task_name in self._tasks:
+            del self._tasks[task_name]
+
+    def run(self):
+        """Перевіряє та виконує завдання, якщо настав час."""
+        now = time.time()
+        for task_name, task in self._tasks.items():
+            if now - task["last_run"] >= task["interval"]:
+                try:
+                    task["callback"]()
+                    self.event_bus.publish("TaskEvent", {"task": task_name, "timestamp": now})
+                except Exception as e:
+                    self.event_bus.publish("ErrorEvent", {"task": task_name, "error": str(e)})
+                task["last_run"] = now
+
+    def list_tasks(self) -> Dict[str, Dict[str, Any]]:
+        """Повертає список усіх завдань."""
+        return self._tasks
