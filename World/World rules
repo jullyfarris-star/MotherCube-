@@ -1,0 +1,41 @@
+📄 World/WorldRules.py
+
+"""
+WorldRules.py
+-------------
+Призначення:
+    Керує глобальними правилами світу MotherCube.
+    Використовується ContextEngine та Simulation.
+    Відповідає за закони фізики, хімії та поведінки.
+
+Принцип:
+    - Зберігає набір правил світу.
+    - Дозволяє додавати, видаляти та змінювати правила.
+    - Інтегрується з WorldState для узгодженості.
+"""
+
+class WorldRules:
+    def __init__(self):
+        self.rules = {}
+
+    def add_rule(self, rule_name: str, value):
+        """Додає нове правило."""
+        self.rules[rule_name] = value
+
+    def remove_rule(self, rule_name: str):
+        """Видаляє правило."""
+        if rule_name in self.rules:
+            del self.rules[rule_name]
+
+    def update_rule(self, rule_name: str, value):
+        """Оновлює існуюче правило."""
+        if rule_name in self.rules:
+            self.rules[rule_name] = value
+
+    def get_rule(self, rule_name: str):
+        """Повертає значення правила."""
+        return self.rules.get(rule_name, None)
+
+    def list_rules(self):
+        """Повертає всі правила світу."""
+        return self.rules
