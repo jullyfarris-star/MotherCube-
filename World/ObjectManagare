@@ -1,0 +1,46 @@
+📄 World/ObjectManager.py
+
+"""
+ObjectManager.py
+----------------
+Призначення:
+    Керує об'єктами у світі MotherCube.
+    Використовується SceneEngine та ContextEngine.
+    Відповідає за створення, видалення та оновлення об'єктів.
+
+Принцип:
+    - Зберігає всі об'єкти світу.
+    - Дозволяє додавати, видаляти та змінювати властивості.
+    - Інтегрується з Simulation для фізики та хімії.
+"""
+
+from Core.Utils import generate_id
+
+
+class ObjectManager:
+    def __init__(self):
+        self.objects = {}
+
+    def create_object(self, properties: dict) -> str:
+        """Створює новий об'єкт у світі."""
+        object_id = generate_id("OBJ")
+        self.objects[object_id] = properties
+        return object_id
+
+    def delete_object(self, object_id: str):
+        """Видаляє об'єкт зі світу."""
+        if object_id in self.objects:
+            del self.objects[object_id]
+
+    def update_object(self, object_id: str, properties: dict):
+        """Оновлює властивості об'єкта."""
+        if object_id in self.objects:
+            self.objects[object_id].update(properties)
+
+    def get_object(self, object_id: str):
+        """Повертає дані про об'єкт."""
+        return self.objects.get(object_id, None)
+
+    def list_objects(self):
+        """Повертає список усіх об'єктів."""
+        return self.objects
